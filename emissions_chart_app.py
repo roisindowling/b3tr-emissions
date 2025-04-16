@@ -4,6 +4,7 @@ import plotly.express as px
 
 # Constants
 SCALING_FACTOR = 1e6
+MIGRATION_AMOUNT = 3750000 # Airdrop amount from testnet migration
 B3TR_CAP = 1000243154
 INITIAL_X_APP_ALLOCATION = 2000000
 
@@ -42,7 +43,6 @@ def calculate_next_x_allocation(cycle, last_allocation):
 # Add bootstrap cycle (cycle 1)
 data = []
 cycle = 2  # Start from cycle 2 since cycle 1 is bootstrapped manually
-migration_amount = 3750000 # Airdrop amount from testnet migration
 total_emissions = 0
 # Simulate bootstrap emissions for cycle 1
 bootstrap_x_allocation = INITIAL_X_APP_ALLOCATION
@@ -79,7 +79,7 @@ while True:
 
     cycle_total = x_allocation + vote2earn + treasury + gm_nft
 
-    if total_emissions + cycle_total + migration_amount > B3TR_CAP:
+    if total_emissions + cycle_total + MIGRATION_AMOUNT > B3TR_CAP:
         # Stop before next cycle if adding would exceed cap
         break
 
@@ -111,19 +111,42 @@ st.plotly_chart(fig, use_container_width=True)
 selected_cycle = st.sidebar.slider("Select Cycle to View Cumulative Emissions", 1, len(df), len(df))
 df_selected = df[df["Cycle"] <= selected_cycle]
 
+# Per-cycle emissions and % for the selected cycle
+st.subheader(f"📆 Cycle {selected_cycle} Emission Breakdown")
+row = df[df["Cycle"] == selected_cycle].iloc[0]
+cycle_total = row["Total"]
+
+def pct_of_cycle(val):
+    return f"{(val / cycle_total) * 100:.2f}%"
+
+col5, col6, col7, col8 = st.columns(4)
+col5.metric("XAllocations (Cycle)", f"{int(row['XAllocations']):,} B3TR", pct_of_cycle(row['XAllocations']))
+col6.metric("Vote2Earn (Cycle)", f"{int(row['Vote2Earn']):,} B3TR", pct_of_cycle(row['Vote2Earn']))
+col7.metric("Treasury (Cycle)", f"{int(row['Treasury']):,} B3TR", pct_of_cycle(row['Treasury']))
+col8.metric("GM-NFT (Cycle)", f"{int(row['GM-NFT']):,} B3TR", pct_of_cycle(row['GM-NFT']))
+
 # Total emissions to date per pool
 total_x = df_selected["XAllocations"].sum()
 total_v2e = df_selected["Vote2Earn"].sum()
 total_treasury = df_selected["Treasury"].sum()
 total_gm_nft = df_selected["GM-NFT"].sum()
+total_all = total_x + total_v2e + total_treasury + total_gm_nft + MIGRATION_AMOUNT
 
-st.subheader(f"Emissions Totals Up to Cycle {selected_cycle}")
+def pct(val):
+    return f"{(val / total_all) * 100:.2f}%"
+total_v2e = df_selected["Vote2Earn"].sum()
+total_treasury = df_selected["Treasury"].sum()
+total_gm_nft = df_selected["GM-NFT"].sum()
+
+st.subheader(f"🚀 Emissions Totals Up to Cycle {selected_cycle}")
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("XAllocations", f"{int(total_x):,} B3TR")
-col2.metric("Vote2Earn", f"{int(total_v2e):,} B3TR")
-col3.metric("Treasury", f"{int(total_treasury):,} B3TR")
-col4.metric("GM-NFT", f"{int(total_gm_nft):,} B3TR")
+col1.metric("XAllocations", f"{int(total_x):,} B3TR", pct(total_x))
+col2.metric("Vote2Earn", f"{int(total_v2e):,} B3TR", pct(total_v2e))
+col3.metric("Treasury", f"{int(total_treasury):,} B3TR", pct(total_treasury))
+col4.metric("GM-NFT", f"{int(total_gm_nft):,} B3TR", pct(total_gm_nft))
+
+
 
 # Show total emissions to date
-st.metric("Total B3TR Supply (All Pools + Migration)", f"{int(total_x + total_v2e + total_treasury + total_gm_nft + migration_amount):,} B3TR")
+st.metric("Total B3TR Supply (All Pools + Migration)", f"{int(total_x + total_v2e + total_treasury + total_gm_nft + MIGRATION_AMOUNT):,} B3TR")
 
