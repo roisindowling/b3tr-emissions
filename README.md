@@ -13,11 +13,9 @@ This tool simulates emissions for the B3TR token across multiple allocation pool
 - Shows cumulative and per-cycle totals
 - Lets users visualize emissions with interactive charts
 
-## 🚀 Try It Out
+## 🚀 Simulator
 
-👉 [Click here to run the simulator on Streamlit Cloud](https://your-streamlit-url.streamlit.app)
-
-> Replace with your actual deployed link after uploading to Streamlit Cloud.
+👉 [B3TR Emissions Simualtor](https://b3tr-emissions.streamlit.app/)
 
 ## ⚙️ Configurable Inputs
 
