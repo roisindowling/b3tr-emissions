@@ -1,0 +1,3 @@
+streamlit
+pandasgit commit -m "Add requirements.txt with streamlit, pandas, plotly"
+plotly
