@@ -7,6 +7,7 @@ SCALING_FACTOR = 1e6
 MIGRATION_AMOUNT = 3750000 # Airdrop amount from testnet migration
 B3TR_CAP = 1000243154
 INITIAL_X_APP_ALLOCATION = 2000000
+GM_NFT_START_ROUND = 46 
 
 # Streamlit app settings
 st.set_page_config(page_title="B3TR Emissions Simulator", layout="wide")
@@ -19,9 +20,6 @@ vote2earn_decay = st.sidebar.slider("Vote2Earn Decay (%)", 0, 100, 20)
 vote2earn_decay_period = st.sidebar.slider("Vote2Earn Decay Period (cycles)", 1, 100, 50)
 max_vote2earn_decay = st.sidebar.slider("Max Vote2Earn Decay (%)", 0, 100, 80)
 treasury_percentage = st.sidebar.slider("Treasury Percentage (%)", 0, 100, 25) * 100
-
-st.sidebar.header("GM-NFT Settings")
-gm_nft_start_round = st.sidebar.number_input("GM-NFT Start Round", min_value=1, value=44)
 gm_nft_percentage = st.sidebar.slider("GM-NFT Share of Treasury (%)", 0, 100, 25)
 
 # Decay logic
@@ -73,7 +71,7 @@ while True:
     treasury = round((x_allocation + vote2earn) * (treasury_percentage / 10000), 6)
 
     gm_nft = 0
-    if cycle >= gm_nft_start_round:
+    if cycle >= GM_NFT_START_ROUND:
         gm_nft = round(treasury * (gm_nft_percentage / 100), 6)
         treasury -= gm_nft
 
